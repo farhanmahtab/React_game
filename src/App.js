@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./style.css";
 
 function App() {
   function randomGenerator(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
-  const [dice, setDice] = useState(generateDices());
+  const [dice, setDice] = useState();
   const [target, setTarget] = useState(generateTarget());
   const [score, setScore] = useState(null);
   const [attempt, setAttempt] = useState(generateAttempt());
   const [remainingAttempt, setReaminingAttempt] = useState(attempt);
   const [level, setlevel] = useState(1);
   const [end, setEnd] = useState(true);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   function generateDices() {
     return randomGenerator(1, 5);
@@ -36,6 +37,7 @@ function App() {
     setTarget(generateTarget());
     setAttempt(genAttempt);
     setScore(0);
+    setDice(0);
     setlevel(localStorage.level);
     setReaminingAttempt(genAttempt);
   }
@@ -49,7 +51,7 @@ function App() {
         } attempts.`
       );
       setlevel((prevLevel) => prevLevel + 1);
-      localStorage.level = level + 1;
+      localStorage.level = parseInt(level) + 1;
     } else if (remainingAttempt <= 0 && score < target) {
       setEnd(true);
       alert(`Oops you lost .Remaining points ${target - score}`);
@@ -60,8 +62,10 @@ function App() {
   }
 
   if (end) {
+    setIsButtonDisabled(true);
     newGame();
     setEnd(false);
+    setIsButtonDisabled(false);
   }
 
   function clickHandler() {
@@ -74,9 +78,13 @@ function App() {
       `dice :${dice} targetAttempt:${attempt} attemptLeft:${remainingAttempt} `
     );
     console.log(`Targetpoint:${target} CurrentPoint:${score} `);
-    chcekForEnd();
   }
 
+  useEffect(() => {
+    setTimeout(() => {
+      chcekForEnd();
+    }, 0);
+  });
   return (
     <>
       <div className="main-container">
@@ -96,7 +104,7 @@ function App() {
             <button
               type="button"
               className="dice-button"
-              onClick={clickHandler}
+              onClick={clickHandler} disabled={isButtonDisabled}
             >
               Roll
             </button>
