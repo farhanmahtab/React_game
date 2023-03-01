@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Alert from "./Alert";
 import "./style.css";
 
 function App() {
@@ -7,12 +8,13 @@ function App() {
   }
   const [dice, setDice] = useState();
   const [target, setTarget] = useState(generateTarget());
-  const [score, setScore] = useState(null);
+  const [score, setScore] = useState();
   const [attempt, setAttempt] = useState(generateAttempt());
-  const [remainingAttempt, setReaminingAttempt] = useState(attempt);
-  const [level, setlevel] = useState(1);
+  const [remainingAttempt, setReaminingAttempt] = useState();
+  const [level, setlevel] = useState();
   const [end, setEnd] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [visibility , setvisibility] = useState(false);
 
   function generateDices() {
     return randomGenerator(1, 5);
@@ -36,10 +38,11 @@ function App() {
     const genAttempt = generateAttempt();
     setTarget(generateTarget());
     setAttempt(genAttempt);
-    setScore(0);
     setDice(0);
+    setScore(0);
     setlevel(localStorage.level);
     setReaminingAttempt(genAttempt);
+    setvisibility(false);
   }
 
   function chcekForEnd() {
@@ -53,26 +56,22 @@ function App() {
       setlevel((prevLevel) => prevLevel + 1);
       localStorage.level = parseInt(level) + 1;
     } else if (remainingAttempt <= 0 && score < target) {
-      setEnd(true);
-      alert(`Oops you lost .Remaining points ${target - score}`);
+      alert(`Oops you lost. Remaining points ${target - score}`);
       newGame();
       setlevel(1);
       localStorage.level = 1;
+
     }
   }
 
-  if (end) {
-    setIsButtonDisabled(true);
-    newGame();
-    setEnd(false);
-    setIsButtonDisabled(false);
-  }
-
   function clickHandler() {
-    setDice(() => generateDices());
-    if (score + dice <= target) setScore(score + dice);
-    setReaminingAttempt((prevAttemp) => {
-      return prevAttemp - 1;
+    const dicevalue = generateDices();
+    setDice(dicevalue);
+    if (score + dicevalue <= target)
+      setScore((prevScore) => prevScore + dicevalue);
+
+    setReaminingAttempt((prevAttempt) => {
+      return prevAttempt - 1;
     });
     console.log(
       `dice :${dice} targetAttempt:${attempt} attemptLeft:${remainingAttempt} `
@@ -85,6 +84,15 @@ function App() {
       chcekForEnd();
     }, 0);
   });
+
+  if (end) {
+    setIsButtonDisabled(true);
+    newGame();
+    setEnd(false);
+    setIsButtonDisabled(false);
+    console.log()
+  }
+
   return (
     <>
       <div className="main-container">
@@ -104,7 +112,8 @@ function App() {
             <button
               type="button"
               className="dice-button"
-              onClick={clickHandler} disabled={isButtonDisabled}
+              onClick={clickHandler}
+              disabled={isButtonDisabled}
             >
               Roll
             </button>
@@ -112,6 +121,12 @@ function App() {
           </div>
           <div className="display-box">{drawCircles()}</div>
         </div>
+        {visibility && <Alert
+          attemptsForSuccess={attempt - remainingAttempt}
+          level={level}
+          newGame={newGame}
+        />} 
+        
       </div>
     </>
   );

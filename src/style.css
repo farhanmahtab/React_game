@@ -86,7 +86,42 @@ h2 {
   font-weight: 700;
   color: blue;
 }
-.dice h2{
+.dice h2 {
   margin-top: 10px;
   margin-right: 5px;
+}
+
+.alertbox {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: 35%;
+  left: 38.5%;
+  height: 200px;
+  width: 350px;
+  background: #fff;
+  border: #181823 2px solid;
+  border-radius: 7px;
+}
+
+.alertbox h3 {
+  align-items: center;
+  justify-self: center;
+  margin-top: 2px;
+  padding: 2px 5px;
+  font-size: 1.2rem;
+}
+.restartButton{
+  width: 100px;
+  height: 50px;
+  margin: 5px;
+  margin-top: 50px;
+  border-radius: 5px;
+  grid-row-start: 11;
+  grid-column: 2/3;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  color: blue;
 }
