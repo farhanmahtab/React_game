@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import Alert from "./Alert";
+import Circle from "./Components/Circle";
 import "./style.css";
 
 function App() {
-  function randomGenerator(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
+  const randomGenerator = (min, max) =>
+    Math.floor(Math.random() * (max - min + 1) + min);
+  const generateDices = () => randomGenerator(1, 5);
+  const generateTarget = () => randomGenerator(25, 50);
+  const generateAttempt = () => randomGenerator(1, 25);
+
   const [dice, setDice] = useState();
   const [target, setTarget] = useState(generateTarget());
   const [score, setScore] = useState();
@@ -14,27 +17,10 @@ function App() {
   const [level, setlevel] = useState();
   const [end, setEnd] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [visibility , setvisibility] = useState(false);
-
-  function generateDices() {
-    return randomGenerator(1, 5);
-  }
-  function generateTarget() {
-    return randomGenerator(25, 50);
-  }
-  function generateAttempt() {
-    return randomGenerator(1, 25);
-  }
-
-  const drawCircles = () => {
-    const circles = [];
-    for (let i = 0; i < score; i++) {
-      circles.push(<div key={i} className="circle"></div>);
-    }
-    return circles;
-  };
+  const [circles, setCircles] = useState([]);
 
   function newGame() {
+    if (!localStorage.level) localStorage.level = 1;
     const genAttempt = generateAttempt();
     setTarget(generateTarget());
     setAttempt(genAttempt);
@@ -42,7 +28,7 @@ function App() {
     setScore(0);
     setlevel(localStorage.level);
     setReaminingAttempt(genAttempt);
-    setvisibility(false);
+    setCircles([]);
   }
 
   function chcekForEnd() {
@@ -57,18 +43,27 @@ function App() {
       localStorage.level = parseInt(level) + 1;
     } else if (remainingAttempt <= 0 && score < target) {
       alert(`Oops you lost. Remaining points ${target - score}`);
-      newGame();
+      setEnd(true);
       setlevel(1);
       localStorage.level = 1;
-
     }
   }
 
   function clickHandler() {
+    let addCircle = false;
     const dicevalue = generateDices();
     setDice(dicevalue);
-    if (score + dicevalue <= target)
+    if (score + dicevalue <= target) {
+      addCircle = !addCircle;
       setScore((prevScore) => prevScore + dicevalue);
+    }
+    if (addCircle) {
+      for (let i = 0; i < dicevalue; i++) {
+        circles.push(i);
+      }
+      setCircles([...circles]);
+      addCircle = !addCircle;
+    }
 
     setReaminingAttempt((prevAttempt) => {
       return prevAttempt - 1;
@@ -90,7 +85,7 @@ function App() {
     newGame();
     setEnd(false);
     setIsButtonDisabled(false);
-    console.log()
+    console.log();
   }
 
   return (
@@ -119,14 +114,10 @@ function App() {
             </button>
             <h2>dice Rolled : {dice}</h2>
           </div>
-          <div className="display-box">{drawCircles()}</div>
+          <div className="display-box">
+            <Circle circles={circles} />
+          </div>
         </div>
-        {visibility && <Alert
-          attemptsForSuccess={attempt - remainingAttempt}
-          level={level}
-          newGame={newGame}
-        />} 
-        
       </div>
     </>
   );
